@@ -24,7 +24,7 @@ public class MainServer{
 
     public void startServer(){
         // spin off UDP thread with executorService.submit()
-        
+        executorService.submit(new UDPManager(1111));
         // spin off game Manager
         
         while (!gameOver){
@@ -36,9 +36,6 @@ public class MainServer{
                 e.printStackTrace();
             }
         }
-
-        
-
 
     }
 

@@ -4,6 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
 import java.util.Scanner;
@@ -25,17 +30,22 @@ public class ClientWindow implements ActionListener
 	private JLabel score;
     private int scoreCount;
 	private TimerTask clock;
-	
+
+	static String ClientID;
+	private char questionNumber;
+
 	private JFrame window;
 	
 	private static SecureRandom random = new SecureRandom();
 	
 	// write setters and getters as you need
 	
-	public ClientWindow() throws FileNotFoundException
+	public ClientWindow(String ID) throws FileNotFoundException
 	{
+		ClientID = ID;
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-        File file = new File("question1.txt");
+        File file = new File("question5.txt");
+		questionNumber = file.getName().charAt(8);
         
         Scanner scan = new Scanner(file);
 		
@@ -43,7 +53,7 @@ public class ClientWindow implements ActionListener
 		question = new JLabel(scan.nextLine()); // represents the question
 		question.setFont(new Font("Calibri", Font.BOLD, 20));
 		window.add(question);
-		question.setBounds(10,5, 350, 100);;
+		question.setBounds(10,5, 550, 100);;
 		
 		options = new JRadioButton[4];
 		optionsText = new String[4];
@@ -90,8 +100,8 @@ public class ClientWindow implements ActionListener
 		window.add(submit);
 		
 		
-		window.setSize(400,400);
-		window.setBounds(500, 200, 400, 400);
+		window.setSize(600,400);
+		window.setBounds(500, 200, 600, 400);
 		window.setLayout(null);
 		window.setVisible(true);
 
@@ -105,7 +115,7 @@ public class ClientWindow implements ActionListener
 	public void actionPerformed(ActionEvent e)
 	{
 		System.out.println("You clicked " + e.getActionCommand());
-		
+
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		
@@ -116,6 +126,27 @@ public class ClientWindow implements ActionListener
             options[1].setEnabled(true);
             options[2].setEnabled(true);
             options[3].setEnabled(true);
+			byte[] buf = null;
+			String message = ClientID+questionNumber;
+			buf = message.getBytes();
+			InetAddress ip = null;
+			try {
+				ip = InetAddress.getLocalHost();
+			} catch (UnknownHostException e1) {
+				e1.printStackTrace();
+			}
+			int port = 1111;
+			DatagramPacket pkt = new DatagramPacket(buf, buf.length, ip, port);
+			DatagramSocket skt = null;
+			try {
+				skt = new DatagramSocket();
+				skt.send(pkt);
+				for(int i=0;i<buf.length;i++){
+					System.out.println("You sent: "+buf[i]);
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		} else if(input.equals("Submit")){
         	if(correctAnswer) scoreCount+=10;
             else scoreCount-=10;
@@ -167,6 +198,7 @@ public class ClientWindow implements ActionListener
             	options[1].setEnabled(false);
             	options[2].setEnabled(false);
             	options[3].setEnabled(false);
+				JOptionPane.showMessageDialog(window, "Your final score is "+scoreCount);
 				this.cancel();  // cancel the timed task
 				return;
 				// you can enable/disable your buttons for poll/submit here as needed

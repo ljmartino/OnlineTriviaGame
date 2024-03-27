@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,8 +26,18 @@ public class UDPManager implements Runnable {
     @Override
     public void run() {
         // runs until thread is destroyed, this class shouldn't have to care about that
+        byte[] buf = new byte[2];
         while (true){
-            // datagramSocket.receive();
+            DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
+            try {
+                datagramSocket.receive(datagramPacket);
+                for(int i=0;i<buf.length;i++){
+                    System.out.println("Received: "+buf[i]);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
 
             /*
              * Need to mess around with UDP some more and figure out how exactly to send and receive
