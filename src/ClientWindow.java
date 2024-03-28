@@ -31,7 +31,7 @@ public class ClientWindow implements ActionListener
     private int scoreCount;
 	private TimerTask clock;
 
-	static String ClientID;
+	static Integer ClientID;
 	private String questionNumber;
 
 	private JFrame window;
@@ -40,11 +40,11 @@ public class ClientWindow implements ActionListener
 	
 	// write setters and getters as you need
 	
-	public ClientWindow(String ID) throws FileNotFoundException
+	public ClientWindow(int ID) throws FileNotFoundException
 	{
 		ClientID = ID;
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-        File file = new File("question06.txt");
+        File file = new File("question11.txt");
 		questionNumber = file.getName().substring(8,10);
         
         Scanner scan = new Scanner(file);
@@ -127,7 +127,7 @@ public class ClientWindow implements ActionListener
             options[2].setEnabled(true);
             options[3].setEnabled(true);
 			byte[] buf = null;
-			String message = ClientID+questionNumber;
+			String message = ClientID+","+questionNumber;
 			buf = message.getBytes();
 			InetAddress ip = null;
 			try {
