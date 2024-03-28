@@ -1,11 +1,13 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainServer{
 
+    private ConcurrentLinkedQueue queue;
     private ServerSocket serverSocket;
     private boolean gameOver;
     // gets incremented everytime a client is added, assigned to client
@@ -14,7 +16,8 @@ public class MainServer{
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public MainServer(int port){
-        this.gameOver = false;
+        gameOver = false;
+        queue = new ConcurrentLinkedQueue<>();
         this.clientIDs = 0;
         try {
             serverSocket = new ServerSocket(port);
@@ -27,8 +30,9 @@ public class MainServer{
 
     public void startServer(){
         // spin off UDP thread with executorService.submit()
-        executorService.submit(new UDPManager(1111));
+        executorService.submit(new UDPManager(1111,queue));
         // spin off game Manager
+        executorService.submit(new GameManager(queue));
         
         while (!gameOver){
             Socket clientSocket = null;
