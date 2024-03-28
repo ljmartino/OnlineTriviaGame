@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
@@ -33,6 +34,7 @@ public class ClientWindow implements ActionListener
 
 	static Integer ClientID;
 	private String questionNumber;
+	private Socket socket;
 
 	private JFrame window;
 	
@@ -40,7 +42,7 @@ public class ClientWindow implements ActionListener
 	
 	// write setters and getters as you need
 	
-	public ClientWindow(int ID) throws FileNotFoundException
+	public ClientWindow(Integer ID, String ipAddress, int port) throws FileNotFoundException
 	{
 		ClientID = ID;
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
@@ -107,6 +109,21 @@ public class ClientWindow implements ActionListener
 
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+
+		// call method to connect to server
+		connect(ipAddress, port);
+	}
+
+	// connect to server with argument of IP address
+	public void connect(String ipAddress, int port){
+		try	{
+			socket = new Socket(ipAddress, port);
+			System.err.println("Hello i am client" );
+		} 
+		catch(IOException ioException){
+			System.out.println(ioException);
+		}
+		
 	}
 
 	// this method is called when you check/uncheck any radio button
