@@ -1,7 +1,9 @@
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameManager implements Runnable{
-    public GameManager(int port){
-
+    private ConcurrentLinkedQueue queue;
+    public GameManager(ConcurrentLinkedQueue q){
+        queue = q;
     }
 
     @Override
