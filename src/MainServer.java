@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class MainServer{
 
-    private ConcurrentLinkedQueue queue;
+    private ConcurrentLinkedQueue<Item> queue;
     private ServerSocket serverSocket;
     private boolean gameOver;
     // executor service is what spins off threads
