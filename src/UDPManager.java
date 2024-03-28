@@ -10,10 +10,10 @@ public class UDPManager implements Runnable {
     // need to add a type here
     private ConcurrentLinkedQueue<Item> queue;
 
-    public UDPManager(int port){
+    public UDPManager(int port, ConcurrentLinkedQueue q){
         this.port = port;
         // not sure what type the queue should be, probably need to specify at some point
-        queue = new ConcurrentLinkedQueue<Item>();
+        queue = q;
         // set up the UDP socket
         try {
             datagramSocket = new DatagramSocket(port);

@@ -1,11 +1,13 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainServer{
 
+    private ConcurrentLinkedQueue queue;
     private ServerSocket serverSocket;
     private boolean gameOver;
     // executor service is what spins off threads
@@ -13,6 +15,7 @@ public class MainServer{
 
     public MainServer(int port){
         gameOver = false;
+        queue = new ConcurrentLinkedQueue<>();
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server is running");
@@ -24,8 +27,9 @@ public class MainServer{
 
     public void startServer(){
         // spin off UDP thread with executorService.submit()
-        executorService.submit(new UDPManager(1111));
+        executorService.submit(new UDPManager(1111,queue));
         // spin off game Manager
+        executorService.submit(new GameManager(queue));
         
         while (!gameOver){
             Socket clientSocket = null;
