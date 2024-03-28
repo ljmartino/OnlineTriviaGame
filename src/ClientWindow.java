@@ -32,7 +32,7 @@ public class ClientWindow implements ActionListener
 	private TimerTask clock;
 
 	static String ClientID;
-	private char questionNumber;
+	private String questionNumber;
 
 	private JFrame window;
 	
@@ -44,8 +44,8 @@ public class ClientWindow implements ActionListener
 	{
 		ClientID = ID;
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-        File file = new File("question5.txt");
-		questionNumber = file.getName().charAt(8);
+        File file = new File("question06.txt");
+		questionNumber = file.getName().substring(8,10);
         
         Scanner scan = new Scanner(file);
 		
@@ -53,7 +53,7 @@ public class ClientWindow implements ActionListener
 		question = new JLabel(scan.nextLine()); // represents the question
 		question.setFont(new Font("Calibri", Font.BOLD, 20));
 		window.add(question);
-		question.setBounds(10,5, 550, 100);;
+		question.setBounds(10,5, 800, 100);;
 		
 		options = new JRadioButton[4];
 		optionsText = new String[4];
@@ -64,7 +64,7 @@ public class ClientWindow implements ActionListener
 			options[index] = new JRadioButton(optionsText[index]);  //Gets text in array and makes it an option
 			// if a radio button is clicked, the event would be thrown to this class to handle
 			options[index].addActionListener(this);
-			options[index].setBounds(10, 110+(index*20), 350, 20);
+			options[index].setBounds(10, 110+(index*20), 450, 20);
 			window.add(options[index]);
 			optionGroup.add(options[index]);
             options[index].setEnabled(false);
@@ -101,7 +101,7 @@ public class ClientWindow implements ActionListener
 		
 		
 		window.setSize(600,400);
-		window.setBounds(500, 200, 600, 400);
+		window.setBounds(400, 200, 900, 400);
 		window.setLayout(null);
 		window.setVisible(true);
 
