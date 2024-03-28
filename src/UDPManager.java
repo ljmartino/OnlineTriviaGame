@@ -8,7 +8,7 @@ public class UDPManager implements Runnable {
     private int port;
     private DatagramSocket datagramSocket;
     // need to add a type here
-    private ConcurrentLinkedQueue queue;
+    private ConcurrentLinkedQueue<Item> queue;
 
     public UDPManager(int port, ConcurrentLinkedQueue q){
         this.port = port;
@@ -26,14 +26,22 @@ public class UDPManager implements Runnable {
     @Override
     public void run() {
         // runs until thread is destroyed, this class shouldn't have to care about that
-        byte[] buf = new byte[2];
+        byte[] buf = new byte[5];
         while (true){
             DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
             try {
                 datagramSocket.receive(datagramPacket);
-                for(int i=0;i<buf.length;i++){
-                    System.out.println("Received: "+buf[i]);
+                Integer clientID, questionNumber;
+                if(buf[1]==44){
+                    clientID = (int)buf[0];
+                    questionNumber = (int)buf[2]+(int)buf[3];
+                } else{
+                    clientID = (int)buf[0]+(int)buf[1];
+                    questionNumber = (int)buf[3]+(int)buf[4];
                 }
+                queue.add(new Item(clientID, questionNumber));
+                System.out.println("ID: "+queue.element().getID());
+                System.out.println("number: "+queue.element().getQuestionNumber());
             } catch (IOException e) {
                 e.printStackTrace();
             }
