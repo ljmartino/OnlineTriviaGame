@@ -26,6 +26,7 @@ public class MainServer{
         // spin off UDP thread with executorService.submit()
         executorService.submit(new UDPManager(1111));
         // spin off game Manager
+        executorService.submit(new GameManager());
         
         while (!gameOver){
             Socket clientSocket = null;
