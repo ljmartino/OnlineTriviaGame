@@ -27,8 +27,7 @@ public class ClientWindow implements ActionListener
 	private JRadioButton options[];
 	private String optionsText[]; //To store text for each option
 	private ButtonGroup optionGroup;
-    private int answerIndex; //Index of answer, last line of text file
-    private boolean correctAnswer; //Determines if button user pressed was correct
+	private int currentSelection;
 	private JLabel question;
 	private JLabel timer;
 	private JLabel timerText;
@@ -132,8 +131,12 @@ public class ClientWindow implements ActionListener
 								questionInfo[2] = (String) inputStream.readObject();
 								questionInfo[3] = (String) inputStream.readObject();
 								questionInfo[4] = inputStream.readObject().toString();
-								answerIndex = inputStream.readInt();
 								displayQuestion(questionInfo);
+							}
+							// if the message is a score message, then increment and display score
+							else if (messageType.equals("Score".trim())){
+								scoreCount += inputStream.readInt();
+								score.setText("SCORE: "+scoreCount);
 							}
 					}
 				}
@@ -232,9 +235,15 @@ public class ClientWindow implements ActionListener
 				e1.printStackTrace();
 			}
 		} else if(input.equals("Submit")){
-        	if(correctAnswer) scoreCount+=10;
-            else scoreCount-=10;
-            score.setText("SCORE: "+scoreCount);
+			// send whatever option was selected
+			try {
+				outputStream.writeInt(currentSelection);
+				outputStream.flush();
+			}
+			catch (IOException e2){
+				e2.printStackTrace();
+			}
+
             buzz.setEnabled(true);
 			submit.setEnabled(false);
             options[0].setEnabled(false);
@@ -242,17 +251,13 @@ public class ClientWindow implements ActionListener
             options[2].setEnabled(false);
             options[3].setEnabled(false);
 		} else if(input.equals(optionsText[0])){
-			if(answerIndex==0) correctAnswer = true;
-            else correctAnswer = false;
+			currentSelection = 0;
 		} else if(input.equals(optionsText[1])){
-			if(answerIndex==1) correctAnswer = true;
-            else correctAnswer = false;
+			currentSelection = 1;
 		} else if(input.equals(optionsText[2])){
-			if(answerIndex==2) correctAnswer = true;
-            else correctAnswer = false;
+			currentSelection = 2;
 		} else if(input.equals(optionsText[3])){
-			if(answerIndex==3) correctAnswer = true;
-            else correctAnswer = false;
+			currentSelection = 3;
 		} else{
 			System.out.println("Incorrect Option");
 		}

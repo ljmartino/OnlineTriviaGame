@@ -13,6 +13,9 @@ public class ClientHandler implements Runnable {
         private ObjectOutputStream out;
         private DataInputStream in;
 
+        // correct answer is updated whenever we send a file
+        private int correctAnswer = -1;
+
         public ClientHandler(Socket clientSocket, int ID)
         {
             this.clientSocket = clientSocket;
@@ -38,6 +41,29 @@ public class ClientHandler implements Runnable {
                 // how to read from client
                 // int words = in.readInt();
                 // System.out.println("Words: " + words);
+
+                // this thread will monitor answers from the client and then send them score
+                Thread thread = new Thread(() -> {
+                    while (true){
+                        try {
+                            int currAnswer = in.readInt();
+                            System.out.println("They answered " + currAnswer + ", and the correct answer is " + correctAnswer);
+                            // if answer is correct send them 10 points, if wrong send them -10 points
+                            if (currAnswer == correctAnswer){
+                                out.writeObject("Score");
+                                out.writeInt(10);
+                            }
+                            else {
+                                out.writeObject("Score");
+                                out.writeInt(-10);
+                            }
+                            out.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                thread.start();
 
                 //Closing socket
                 // clientSocket.close();
@@ -73,8 +99,8 @@ public class ClientHandler implements Runnable {
                     out.writeObject(line); 
                     counter++;
                 }
-                // last line in file is just an int for the answer so send that
-                out.writeInt(scanner.nextInt());
+                // last line in file is just an int for the answer so store it
+                correctAnswer = scanner.nextInt();
                 out.flush();
 
                 scanner.close();
