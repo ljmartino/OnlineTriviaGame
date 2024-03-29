@@ -38,6 +38,7 @@ public class MainServer{
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
+                clientSocket.setReuseAddress(true);
                 System.out.println("New client connected: " + clientSocket);
                 // make a new client handler with the socket as well as give them an ID
                 clientIDs++;

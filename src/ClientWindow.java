@@ -3,9 +3,11 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -38,6 +40,9 @@ public class ClientWindow implements ActionListener
 	private Integer ClientID;
 	private String questionNumber;
 	private Socket socket;
+	private DataInputStream inputStream;
+	private DataOutputStream outputStream;
+	private ObjectInputStream fileInputStream;
 
 	private JFrame window;
 	
@@ -120,15 +125,15 @@ public class ClientWindow implements ActionListener
 	public void connect(String ipAddress, int port){
 		try	{
 			// create a socket connection to the server
-			// the thread immediately sends the client its ID and the client saves it to a variable
+			// the thread immediately sends the client its ID and the client saves it
 			socket = new Socket(ipAddress, port);
-			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            DataInputStream in = new DataInputStream(socket.getInputStream());
-			this.ClientID = Integer.valueOf(in.readInt());
+			inputStream = new DataInputStream(socket.getInputStream());
+			outputStream = new DataOutputStream(socket.getOutputStream());
+			this.ClientID = Integer.valueOf(inputStream.readInt());
 			System.out.println("Hello i am client " + this.ClientID);
 		} 
 		catch(IOException ioException){
-			System.out.println(ioException);
+			ioException.printStackTrace();
 		}
 		
 	}
