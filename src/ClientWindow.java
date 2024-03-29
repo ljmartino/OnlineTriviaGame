@@ -40,9 +40,8 @@ public class ClientWindow implements ActionListener
 	private Integer ClientID;
 	private String questionNumber;
 	private Socket socket;
-	private DataInputStream inputStream;
+	private ObjectInputStream inputStream;
 	private DataOutputStream outputStream;
-	private ObjectInputStream fileInputStream;
 
 	private JFrame window;
 	
@@ -53,60 +52,30 @@ public class ClientWindow implements ActionListener
 	public ClientWindow(String ipAddress, int port) throws FileNotFoundException
 	{
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
-        File file = new File("question11.txt");
-		questionNumber = file.getName().substring(8,10);
-        
-        Scanner scan = new Scanner(file);
 		
 		window = new JFrame("Trivia");
-		question = new JLabel(scan.nextLine()); // represents the question
-		question.setFont(new Font("Calibri", Font.BOLD, 20));
-		window.add(question);
-		question.setBounds(10,5, 800, 100);;
 		
-		options = new JRadioButton[4];
-		optionsText = new String[4];
-		optionGroup = new ButtonGroup();
-		for(int index=0; index<options.length; index++)
-		{
-			optionsText[index] = scan.nextLine(); //Gets text from file and stores each option as a string
-			options[index] = new JRadioButton(optionsText[index]);  //Gets text in array and makes it an option
-			// if a radio button is clicked, the event would be thrown to this class to handle
-			options[index].addActionListener(this);
-			options[index].setBounds(10, 110+(index*20), 450, 20);
-			window.add(options[index]);
-			optionGroup.add(options[index]);
-            options[index].setEnabled(false);
-		}
-
-        answerIndex = scan.nextInt(); //Gets index of answer (0, 1, 2, or 3)
-		scan.close();
-
+		
 		timer = new JLabel("TIMER");  // represents the countdown shown on the window
 		timer.setBounds(250, 250, 100, 20);
+
 		clock = new TimerCode(30);  // represents clocked task that should run after X seconds
 		Timer t = new Timer();  // event generator
 		t.schedule(clock, 0, 1000); // clock is called every second
-		window.add(timer);
-		
 		
 		score = new JLabel("SCORE: "+scoreCount); // represents the score
 		score.setBounds(50, 250, 100, 20);
-		window.add(score);
 
 		timerText = new JLabel("TIMER"); // represents the time
 		timerText.setBounds(235, 230, 100, 20);
-		window.add(timerText);
 
 		buzz = new JButton("Buzz");  // button that use clicks/ like a buzzer
 		buzz.setBounds(10, 300, 100, 20);
 		buzz.addActionListener(this);  // calls actionPerformed of this class
-		window.add(buzz);
 		
 		submit = new JButton("Submit");  // button to submit their answer
 		submit.setBounds(200, 300, 100, 20);
 		submit.addActionListener(this);  // calls actionPerformed of this class
-		window.add(submit);
 		
 		
 		window.setSize(600,400);
@@ -119,6 +88,8 @@ public class ClientWindow implements ActionListener
 
 		// call method to connect to server
 		connect(ipAddress, port);
+
+		
 	}
 
 	// connect to server with argument of IP address
@@ -127,7 +98,7 @@ public class ClientWindow implements ActionListener
 			// create a socket connection to the server
 			// the thread immediately sends the client its ID and the client saves it
 			socket = new Socket(ipAddress, port);
-			inputStream = new DataInputStream(socket.getInputStream());
+			inputStream = new ObjectInputStream(socket.getInputStream());
 			outputStream = new DataOutputStream(socket.getOutputStream());
 			this.ClientID = Integer.valueOf(inputStream.readInt());
 			System.out.println("Hello i am client " + this.ClientID);
@@ -135,8 +106,92 @@ public class ClientWindow implements ActionListener
 		catch(IOException ioException){
 			ioException.printStackTrace();
 		}
+
+		// now we start up a "swingworker", which is essentially a thread
+		// it will not block the main GUI from processing and can handle our network stuff
+		SwingWorker<Void, Void> worker = new SwingWorker<Void,Void>() {
+			@Override
+			protected Void doInBackground() {
+				try{
+					while (true){
+						// read message type from server and take different action depending on it
+							String messageType = (String) inputStream.readObject();
+							if (messageType.equals("File".trim())){
+								// first thing that is sent is the question number
+								int questionNum = inputStream.readInt();
+								if (questionNum < 10){
+									questionNumber = "0" + questionNum;
+								}
+								else {
+									questionNumber = "" + questionNum;
+								}
+								// call process to start up a new question and display it
+								String[] questionInfo = new String[5];
+								questionInfo[0] = (String) inputStream.readObject();
+								questionInfo[1] = (String) inputStream.readObject();
+								questionInfo[2] = (String) inputStream.readObject();
+								questionInfo[3] = (String) inputStream.readObject();
+								questionInfo[4] = inputStream.readObject().toString();
+								answerIndex = inputStream.readInt();
+								displayQuestion(questionInfo);
+							}
+					}
+				}
+				catch (IOException e){
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				return null;
+				
+			}
+		};
+		worker.execute();
 		
 	}
+
+	public void displayQuestion(String[] questionFile){
+
+		// Remove existing components from the window
+		window.getContentPane().removeAll();
+	
+		// Add the new question label
+		question = new JLabel(questionFile[0]);
+		question.setFont(new Font("Calibri", Font.BOLD, 20));
+		window.add(question);
+		question.setBounds(10,5, 800, 100);
+	
+		// Add new radio buttons for options
+		options = new JRadioButton[4];
+		optionsText = new String[4];
+		optionGroup = new ButtonGroup();
+		for(int index=0; index<options.length; index++)
+		{
+			optionsText[index] = questionFile[index+1]; // Gets text from file for options
+			options[index] = new JRadioButton(optionsText[index]);
+			options[index].addActionListener(this);
+			options[index].setBounds(10, 110+(index*20), 450, 20);
+			window.add(options[index]);
+			optionGroup.add(options[index]);
+			options[index].setEnabled(false);
+		}
+
+		 // Add the buttons
+		 window.add(buzz);
+		 window.add(submit);
+	 
+		 // Add the timer labels
+		 window.add(timer);
+		 window.add(timerText);
+
+		 // add the score
+		 window.add(score);
+	
+		// Repaint the window to reflect changes
+		window.revalidate();
+		window.repaint();
+	}
+	
 
 	// this method is called when you check/uncheck any radio button
 	// this method is called when you press either of the buttons- submit/poll
