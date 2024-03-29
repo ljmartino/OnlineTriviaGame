@@ -40,7 +40,9 @@ public class MainServer{
                 clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket);
                 // make a new client handler with the socket as well as give them an ID
-                executorService.submit(new ClientHandler(clientSocket, ++clientIDs));
+                clientIDs++;
+                System.out.println(clientIDs);
+                executorService.submit(new ClientHandler(clientSocket, clientIDs));
             } catch (IOException e) {
                 e.printStackTrace();
             }

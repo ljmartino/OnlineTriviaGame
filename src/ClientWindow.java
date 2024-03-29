@@ -2,9 +2,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -32,7 +34,8 @@ public class ClientWindow implements ActionListener
     private int scoreCount;
 	private TimerTask clock;
 
-	static Integer ClientID;
+	// clientID is given from the server
+	private Integer ClientID;
 	private String questionNumber;
 	private Socket socket;
 
@@ -42,9 +45,8 @@ public class ClientWindow implements ActionListener
 	
 	// write setters and getters as you need
 	
-	public ClientWindow(Integer ID, String ipAddress, int port) throws FileNotFoundException
+	public ClientWindow(String ipAddress, int port) throws FileNotFoundException
 	{
-		ClientID = ID;
 		JOptionPane.showMessageDialog(window, "This is a trivia game");
         File file = new File("question11.txt");
 		questionNumber = file.getName().substring(8,10);
@@ -117,8 +119,13 @@ public class ClientWindow implements ActionListener
 	// connect to server with argument of IP address
 	public void connect(String ipAddress, int port){
 		try	{
+			// create a socket connection to the server
+			// the thread immediately sends the client its ID and the client saves it to a variable
 			socket = new Socket(ipAddress, port);
-			System.err.println("Hello i am client" );
+			ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+			this.ClientID = Integer.valueOf(in.readInt());
+			System.out.println("Hello i am client " + this.ClientID);
 		} 
 		catch(IOException ioException){
 			System.out.println(ioException);

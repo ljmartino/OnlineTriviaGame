@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -17,12 +18,12 @@ public class ClientHandler implements Runnable {
         public void run()
         {
            
-            try (ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+            try (DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                  DataInputStream in = new DataInputStream(clientSocket.getInputStream());)
             {
 
                 // send the client it's ID so that it knows it
-                out.writeObject(this.ID);
+                out.writeInt(this.ID);
                 out.flush();
                 
 
