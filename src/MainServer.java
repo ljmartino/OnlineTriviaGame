@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class MainServer{
 
-    private ConcurrentLinkedQueue queue;
+    private ConcurrentLinkedQueue<Item> queue;
     private ServerSocket serverSocket;
     private boolean gameOver;
     // gets incremented everytime a client is added, assigned to client

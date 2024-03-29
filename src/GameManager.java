@@ -1,8 +1,8 @@
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameManager implements Runnable{
-    private ConcurrentLinkedQueue queue;
-    public GameManager(ConcurrentLinkedQueue q){
+    private ConcurrentLinkedQueue<Item> queue;
+    public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
     }
 

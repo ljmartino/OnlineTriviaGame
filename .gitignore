@@ -1,0 +1,7 @@
+# Ignore Visual Studio Code generated files
+.vscode/
+*.vscode/
+*.code-workspace
+
+# Ignore Java .class files
+*.class
