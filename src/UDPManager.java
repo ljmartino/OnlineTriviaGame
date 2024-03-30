@@ -39,8 +39,10 @@ public class UDPManager implements Runnable {
                     clientID = ((int)buf[0]-48)*10+(int)buf[1]-48;
                     questionNumber = ((int)buf[3]-48)*10+(int)buf[4]-48;
                 }
+                System.out.println("ID buzzed in: "+clientID);
+                System.out.println("number: "+questionNumber);
                 queue.add(new Item(clientID, questionNumber));
-                System.out.println("ID: "+queue.element().getID());
+                System.out.println("ID at head: "+queue.element().getID());
                 System.out.println("number: "+queue.element().getQuestionNumber());
             } catch (IOException e) {
                 e.printStackTrace();

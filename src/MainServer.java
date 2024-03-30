@@ -34,6 +34,12 @@ public class MainServer{
         // spin off game Manager
         executorService.submit(new GameManager(queue));
         
+        System.out.println("Joining period has started, 30 seconds to join");
+        try {
+            Thread.sleep(30000); //Waits 30 seconds to start accepting
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         while (!gameOver){
             Socket clientSocket = null;
             try {
