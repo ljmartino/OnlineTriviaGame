@@ -25,7 +25,7 @@ public class GameManager implements Runnable{
         } 
         //If reached this point, a client has answered and the queue is not empty
         //Pull first item from the queue
-        //clientAnswering = Item.getClientName();
+        clientAnswering = queue.peek().getID();//Gets ID of first client inside the queue
         //Clients will look at this then the correct one will answer
         
     }
