@@ -10,7 +10,7 @@ public class UDPManager implements Runnable {
     // need to add a type here
     private ConcurrentLinkedQueue<Item> queue;
 
-    public UDPManager(int port, ConcurrentLinkedQueue q){
+    public UDPManager(int port, ConcurrentLinkedQueue<Item> q){
         this.port = port;
         // not sure what type the queue should be, probably need to specify at some point
         queue = q;
@@ -33,14 +33,16 @@ public class UDPManager implements Runnable {
                 datagramSocket.receive(datagramPacket);
                 Integer clientID, questionNumber;
                 if(buf[1]==44){
-                    clientID = (int)buf[0];
-                    questionNumber = (int)buf[2]+(int)buf[3];
+                    clientID = (int)buf[0]-48;
+                    questionNumber = ((int)buf[2]-48)*10+(int)buf[3]-48;
                 } else{
-                    clientID = (int)buf[0]+(int)buf[1];
-                    questionNumber = (int)buf[3]+(int)buf[4];
+                    clientID = ((int)buf[0]-48)*10+(int)buf[1]-48;
+                    questionNumber = ((int)buf[3]-48)*10+(int)buf[4]-48;
                 }
+                System.out.println("ID buzzed in: "+clientID);
+                System.out.println("number: "+questionNumber);
                 queue.add(new Item(clientID, questionNumber));
-                System.out.println("ID: "+queue.element().getID());
+                System.out.println("ID at head: "+queue.element().getID());
                 System.out.println("number: "+queue.element().getQuestionNumber());
             } catch (IOException e) {
                 e.printStackTrace();

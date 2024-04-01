@@ -7,15 +7,18 @@ import java.util.concurrent.Executors;
 
 public class MainServer{
 
-    private ConcurrentLinkedQueue queue;
+    private ConcurrentLinkedQueue<Item> queue;
     private ServerSocket serverSocket;
     private boolean gameOver;
+    // gets incremented everytime a client is added, assigned to client
+    private int clientIDs;
     // executor service is what spins off threads
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public MainServer(int port){
         gameOver = false;
         queue = new ConcurrentLinkedQueue<>();
+        this.clientIDs = 0;
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server is running");
@@ -31,11 +34,22 @@ public class MainServer{
         // spin off game Manager
         executorService.submit(new GameManager(queue));
         
+        System.out.println("Joining period has started, 30 seconds to join");
+        try {
+            Thread.sleep(30000); //Waits 30 seconds to start accepting
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         while (!gameOver){
             Socket clientSocket = null;
             try {
                 clientSocket = serverSocket.accept();
+                clientSocket.setReuseAddress(true);
                 System.out.println("New client connected: " + clientSocket);
+                // make a new client handler with the socket as well as give them an ID
+                clientIDs++;
+                System.out.println(clientIDs);
+                executorService.submit(new ClientHandler(clientSocket, clientIDs));
             } catch (IOException e) {
                 e.printStackTrace();
             }

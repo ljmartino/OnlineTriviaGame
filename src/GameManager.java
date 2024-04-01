@@ -3,8 +3,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GameManager implements Runnable{
     public static Boolean nextQ;
     public static int clientAnswering;
-    private ConcurrentLinkedQueue queue;
-    public GameManager(ConcurrentLinkedQueue q){
+    private ConcurrentLinkedQueue<Item> queue;
+    public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
         nextQ = false;
         clientAnswering = 0;//"Null" value for clinets -> No client 0
