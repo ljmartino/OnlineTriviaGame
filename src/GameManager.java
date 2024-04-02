@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GameManager implements Runnable{
     public static Boolean gameIsRunning = true;
     public static Boolean nextQ;
-    public static int clientAnswering;
     public static Boolean clientAnswered;
     private ConcurrentLinkedQueue<Item> queue;
     public static ConcurrentLinkedQueue<Item> notFirst;
@@ -12,7 +11,6 @@ public class GameManager implements Runnable{
     public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
         nextQ = false;
-        clientAnswering = 0;//"Null" value for clients -> No client 0
         notFirst = new ConcurrentLinkedQueue<Item>();
         arrayQ = new int[20];
     }
