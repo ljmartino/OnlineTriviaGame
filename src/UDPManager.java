@@ -44,7 +44,10 @@ public class UDPManager implements Runnable {
                 queue.add(new Item(clientID, questionNumber));
                 System.out.println("ID at head: "+queue.element().getID());
                 System.out.println("number: "+queue.element().getQuestionNumber());
+                queue.wait(100);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e){
                 e.printStackTrace();
             }
             

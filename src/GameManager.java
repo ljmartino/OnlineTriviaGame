@@ -21,7 +21,7 @@ public class GameManager implements Runnable{
          //Using a thread to constantly look at the queue and handle new buzzes as they come in
          Thread queueLooker = new Thread(() -> {
             while(true){
-                if (queue.isEmpty()){
+                if (!queue.isEmpty()){
                     System.out.println("Queue is not empty");
                     try{
                         Item next = queue.remove();
@@ -40,10 +40,13 @@ public class GameManager implements Runnable{
                         //deal with it -> whatchu gonna do?
                     }
                 }
+                else{
+                    //System.out.println("Queue is empty");
+                }
                 
             }
         });
-        // queueLooker.start();
+        queueLooker.start();
 
         // while(gameIsRunning){
            
