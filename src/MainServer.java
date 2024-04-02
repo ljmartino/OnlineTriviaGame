@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,6 +14,8 @@ public class MainServer{
     private boolean gameOver;
     // gets incremented everytime a client is added, assigned to client
     private int clientIDs;
+    //List of active clients maintained by server
+    private ArrayList<Integer> activeClients;
     // executor service is what spins off threads
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -19,6 +23,7 @@ public class MainServer{
         gameOver = false;
         queue = new ConcurrentLinkedQueue<>();
         this.clientIDs = 0;
+        activeClients = new ArrayList<Integer>();
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server is running");
@@ -48,6 +53,7 @@ public class MainServer{
                 System.out.println("New client connected: " + clientSocket);
                 // make a new client handler with the socket as well as give them an ID
                 clientIDs++;
+                activeClients.add(clientIDs);
                 System.out.println(clientIDs);
                 executorService.submit(new ClientHandler(clientSocket, clientIDs));
             } catch (IOException e) {

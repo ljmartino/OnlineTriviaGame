@@ -28,6 +28,7 @@ public class ClientWindow implements ActionListener
 	private String optionsText[]; //To store text for each option
 	private ButtonGroup optionGroup;
 	private int currentSelection;
+	private JLabel waitingMessage;
 	private JLabel question;
 	private JLabel timer;
 	private JLabel timerText;
@@ -50,10 +51,13 @@ public class ClientWindow implements ActionListener
 	
 	public ClientWindow(String ipAddress, int port) throws FileNotFoundException
 	{
-		JOptionPane.showMessageDialog(window, "This is a trivia game");
+		//JOptionPane.showMessageDialog(window, "This is a trivia game");
 		
 		window = new JFrame("Trivia");
 		
+		waitingMessage = new JLabel("Waiting for game to start...");
+		waitingMessage.setBounds(250, 150, 400, 50);
+		waitingMessage.setFont(new Font("Calibri", Font.BOLD, 30));
 		
 		timer = new JLabel("TIMER");  // represents the countdown shown on the window
 		timer.setBounds(250, 250, 100, 20);
@@ -84,6 +88,8 @@ public class ClientWindow implements ActionListener
 
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
+
+		window.add(waitingMessage);
 
 		// call method to connect to server
 		connect(ipAddress, port);
@@ -157,6 +163,7 @@ public class ClientWindow implements ActionListener
 
 		// Remove existing components from the window
 		window.getContentPane().removeAll();
+		window.setTitle("Trivia - Player #"+this.ClientID);
 	
 		clock = new TimerCode(30);
 		Timer t = new Timer();  // event generator
