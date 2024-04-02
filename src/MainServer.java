@@ -15,7 +15,7 @@ public class MainServer{
     // gets incremented everytime a client is added, assigned to client
     private int clientIDs;
     //List of active clients maintained by server
-    private ArrayList<Integer> activeClients;
+    private ArrayList<ClientHandler> activeClients;
     // executor service is what spins off threads
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -23,7 +23,7 @@ public class MainServer{
         gameOver = false;
         queue = new ConcurrentLinkedQueue<>();
         this.clientIDs = 0;
-        activeClients = new ArrayList<Integer>();
+        activeClients = new ArrayList<ClientHandler>();
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server is running");
@@ -53,9 +53,9 @@ public class MainServer{
                 System.out.println("New client connected: " + clientSocket);
                 // make a new client handler with the socket as well as give them an ID
                 clientIDs++;
-                activeClients.add(clientIDs);
-                System.out.println(clientIDs);
-                executorService.submit(new ClientHandler(clientSocket, clientIDs));
+                ClientHandler ch = new ClientHandler(clientSocket, clientIDs);
+                activeClients.add(ch);
+                executorService.submit(ch);
             } catch (IOException e) {
                 e.printStackTrace();
             }
