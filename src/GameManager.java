@@ -7,19 +7,19 @@ public class GameManager implements Runnable{
     public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
         nextQ = false;
-        clientAnswering = 0;//"Null" value for clinets -> No client 0
+        clientAnswering = 0;//"Null" value for clients -> No client 0
     }
 
     @Override
     public void run() {
-        Boolean answerRecieved = false;
-        while(!answerRecieved){
+        Boolean answerReceived = false;
+        while(!answerReceived){
             if(nextQ == false){
                 if(queue.isEmpty()){
-                    answerRecieved = false;
+                    answerReceived = false;
                 }
                 if(!queue.isEmpty()){
-                    answerRecieved = true;
+                    answerReceived = true;
                 }
             }
         } 

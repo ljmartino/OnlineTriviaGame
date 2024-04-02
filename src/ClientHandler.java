@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class ClientHandler implements Runnable {
@@ -58,6 +59,9 @@ public class ClientHandler implements Runnable {
                                 out.writeInt(-10);
                             }
                             out.flush();
+                        } catch(SocketException se){
+                            System.out.println("Client "+this.ID+" left");
+                            break;
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
