@@ -14,7 +14,7 @@ public class ClientHandler implements Runnable {
         private int scoreCount;
         private ObjectOutputStream out;
         private DataInputStream in;
-        private boolean waiting;
+        private boolean waiting = false;
         public int questionNumber;
 
         // correct answer is updated whenever we send a file
@@ -83,16 +83,19 @@ public class ClientHandler implements Runnable {
                 // while game is running - this will send acks and nacks
                 while (GameManager.gameIsRunning){
                     // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
-                    if (GameManager.arrayQ[questionNumber-1] == this.ID && !waiting){
+                    System.out.println(GameManager.arrayQ[questionNumber-1]);
+                    if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting){
                         waiting = true;
                         out.writeObject("Ack");
                         out.flush();
                     }
                     // else if not first is equal to this ID, remove it and send a nack
-                    else if (GameManager.notFirst.peek().getID() == (Integer) this.ID){
-                        GameManager.notFirst.remove();
-                        out.writeObject("Nack");
-                        out.flush();
+                    else if (!GameManager.notFirst.isEmpty()){
+                        if (GameManager.notFirst.peek().getID() == (Integer) this.ID){
+                            GameManager.notFirst.remove();
+                            out.writeObject("Nack");
+                            out.flush();
+                        }
                     }
                 }
 

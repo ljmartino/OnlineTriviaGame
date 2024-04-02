@@ -22,22 +22,22 @@ public class GameManager implements Runnable{
          Thread queueLooker = new Thread(() -> {
             while(true){
                 if (!queue.isEmpty()){
-                    System.out.println("Queue is not empty");
                     try{
                         Item next = queue.remove();
                         //Looks at array and finds out if someone answered already
                         if(GameManager.arrayQ[next.getQuestionNumber()-1] != 0){
                             //question was already answered by another client
                             GameManager.notFirst.add(next);
-                            System.out.println("yes");
+                            notFirst.wait(10);
                         }
                         else{//nothing was in the spot: first buzz for that specific question
                             GameManager.arrayQ[next.getQuestionNumber()-1] = next.getID(); //Adds client ID to the array
-                            System.out.println("hello");
                         }
                     }
                     catch(NoSuchElementException e){
                         //deal with it -> whatchu gonna do?
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
                 else{
