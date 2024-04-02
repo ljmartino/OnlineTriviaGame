@@ -13,6 +13,8 @@ public class ClientHandler implements Runnable {
         private int ID;
         private ObjectOutputStream out;
         private DataInputStream in;
+        private boolean waiting;
+        public int questionNumber;
 
         // correct answer is updated whenever we send a file
         private int correctAnswer = -1;
@@ -39,15 +41,13 @@ public class ClientHandler implements Runnable {
                 // everything else is handled
                 sendFile(1);
 
-                // how to read from client
-                // int words = in.readInt();
-                // System.out.println("Words: " + words);
 
                 // this thread will monitor answers from the client and then send them score
                 Thread thread = new Thread(() -> {
                     while (true){
                         try {
                             int currAnswer = in.readInt();
+                            waiting = false;
                             System.out.println("They answered " + currAnswer + ", and the correct answer is " + correctAnswer);
                             // if answer is correct send them 10 points, if wrong send them -10 points
                             if (currAnswer == correctAnswer){
@@ -69,6 +69,22 @@ public class ClientHandler implements Runnable {
                 });
                 thread.start();
 
+                // while game is running - this will send acks and nacks
+                while (GameManager.gameIsRunning){
+                    // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
+                    if (GameManager.arrayQ[questionNumber-1] == this.ID && !waiting){
+                        waiting = true;
+                        out.writeObject("Ack");
+                        out.flush();
+                    }
+                    // else if not first is equal to this ID, remove it and send a nack
+                    else if (GameManager.notFirst.peek().getID() == (Integer) this.ID){
+                        GameManager.notFirst.remove();
+                        out.writeObject("Nack");
+                        out.flush();
+                    }
+                }
+
                 //Closing socket
                 // clientSocket.close();
             } catch (IOException ioException)
@@ -78,10 +94,11 @@ public class ClientHandler implements Runnable {
         }
 
         public void sendFile(int questionNumber){
+            this.questionNumber = questionNumber;
             File file = null;
             String filepath = "";
             if (questionNumber < 10){
-                filepath = "OnlineTriviaGame\\src\\question0" + questionNumber + ".txt";
+                filepath = "question0" + questionNumber + ".txt";
             }
             else {
                 filepath = "question" + questionNumber + ".txt";

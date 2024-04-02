@@ -43,6 +43,7 @@ public class ClientWindow implements ActionListener
 	private ObjectInputStream inputStream;
 	private DataOutputStream outputStream;
 	private String serverIP;
+	private boolean noNACKS;
 
 	private JFrame window;
 	
@@ -146,6 +147,20 @@ public class ClientWindow implements ActionListener
 								scoreCount += inputStream.readInt();
 								score.setText("SCORE: "+scoreCount);
 							}
+							// if the message is an ack, then allow user to answer
+							else if (messageType.equals("Ack".trim())){
+								System.out.println("Ack received");
+								submit.setEnabled(true);
+            					options[0].setEnabled(true);
+            					options[1].setEnabled(true);
+            					options[2].setEnabled(true);
+            					options[3].setEnabled(true);
+								noNACKS = true;
+							}
+							else if (messageType.equals("Nack".trim()) && !noNACKS){
+								// to do
+								System.out.println("NACK");
+							}
 					}
 				}
 				catch (IOException e){
@@ -220,12 +235,8 @@ public class ClientWindow implements ActionListener
 		String input = e.getActionCommand();  
 		
 		if(input.equals("Buzz")){
-			buzz.setEnabled(false);
-			submit.setEnabled(true);
-            options[0].setEnabled(true);
-            options[1].setEnabled(true);
-            options[2].setEnabled(true);
-            options[3].setEnabled(true);
+			// buzz.setEnabled(false);
+			
 			byte[] buf = null;
 			String message = ClientID+","+questionNumber;
 			buf = message.getBytes();
@@ -248,6 +259,7 @@ public class ClientWindow implements ActionListener
 				e1.printStackTrace();
 			}
 		} else if(input.equals("Submit")){
+			noNACKS = false;
 			// send whatever option was selected
 			try {
 				outputStream.writeInt(currentSelection);
@@ -257,7 +269,7 @@ public class ClientWindow implements ActionListener
 				e2.printStackTrace();
 			}
 
-            buzz.setEnabled(true);
+            // buzz.setEnabled(true);
 			submit.setEnabled(false);
             options[0].setEnabled(false);
             options[1].setEnabled(false);

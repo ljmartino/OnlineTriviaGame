@@ -17,32 +17,40 @@ public class GameManager implements Runnable{
 
     @Override
     public void run() {
-        while(gameIsRunning){
-            //Using a thread to constantly look at the queue and handle new buzzes as they come in
-            Thread queueLooker = new Thread(() -> {
-                while(true){
+
+         //Using a thread to constantly look at the queue and handle new buzzes as they come in
+         Thread queueLooker = new Thread(() -> {
+            while(true){
+                if (queue.isEmpty()){
+                    System.out.println("Queue is not empty");
                     try{
                         Item next = queue.remove();
                         //Looks at array and finds out if someone answered already
-                        if(arrayQ[next.getQuestionNumber()-1] != 0){
+                        if(GameManager.arrayQ[next.getQuestionNumber()-1] != 0){
                             //question was already answered by another client
-                            notFirst.add(next);
+                            GameManager.notFirst.add(next);
+                            System.out.println("yes");
                         }
                         else{//nothing was in the spot: first buzz for that specific question
-                            arrayQ[next.getQuestionNumber()-1] = next.getID(); //Adds client ID to the array
+                            GameManager.arrayQ[next.getQuestionNumber()-1] = next.getID(); //Adds client ID to the array
+                            System.out.println("hello");
                         }
                     }
                     catch(NoSuchElementException e){
                         //deal with it -> whatchu gonna do?
                     }
                 }
-            });
-            queueLooker.start();
-            
-            while(!clientAnswered){
-                //stay
+                
             }
-            nextQ = true;
-        }
+        });
+        // queueLooker.start();
+
+        // while(gameIsRunning){
+           
+        //     while(!clientAnswered){
+        //         //stay
+        //     }
+        //     nextQ = true;
+        // }
     }
 }
