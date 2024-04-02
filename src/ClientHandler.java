@@ -109,7 +109,7 @@ public class ClientHandler implements Runnable {
             File file = null;
             String filepath = "";
             if (questionNumber < 10){
-                filepath = "OnlineTriviaGame\\src\\question0" + questionNumber + ".txt";
+                filepath = "question0" + questionNumber + ".txt";
             }
             else {
                 filepath = "question" + questionNumber + ".txt";
