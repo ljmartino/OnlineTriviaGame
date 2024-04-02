@@ -42,6 +42,7 @@ public class ClientWindow implements ActionListener
 	private Socket socket;
 	private ObjectInputStream inputStream;
 	private DataOutputStream outputStream;
+	private String serverIP;
 
 	private JFrame window;
 	
@@ -52,6 +53,7 @@ public class ClientWindow implements ActionListener
 	public ClientWindow(String ipAddress, int port) throws FileNotFoundException
 	{
 		//JOptionPane.showMessageDialog(window, "This is a trivia game");
+		this.serverIP = ipAddress;
 		
 		window = new JFrame("Trivia");
 		
@@ -229,7 +231,7 @@ public class ClientWindow implements ActionListener
 			buf = message.getBytes();
 			InetAddress ip = null;
 			try {
-				ip = InetAddress.getLocalHost();
+				ip = InetAddress.getByName(serverIP);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
 			}
