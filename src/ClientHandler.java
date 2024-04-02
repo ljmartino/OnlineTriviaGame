@@ -11,6 +11,7 @@ public class ClientHandler implements Runnable {
         private Socket clientSocket;
         // unique client identifier
         private int ID;
+        private int scoreCount;
         private ObjectOutputStream out;
         private DataInputStream in;
         private boolean waiting;
@@ -23,7 +24,17 @@ public class ClientHandler implements Runnable {
         {
             this.clientSocket = clientSocket;
             this.ID = ID;
+            this.scoreCount = 0;
         }
+
+        public int getID(){
+            return this.ID;
+        }
+
+        public int getScore(){
+            return this.scoreCount;
+        }
+
         @Override
         public void run()
         {
