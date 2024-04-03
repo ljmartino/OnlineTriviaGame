@@ -19,6 +19,7 @@ public class ClientHandler implements Runnable {
 
         // correct answer is updated whenever we send a file
         private int correctAnswer = -1;
+        private int finalScore = 0;
 
         public ClientHandler(Socket clientSocket, int ID)
         {
@@ -57,19 +58,26 @@ public class ClientHandler implements Runnable {
                 Thread thread = new Thread(() -> {
                     while (true){
                         try {
-                            int currAnswer = in.readInt();
-                            waiting = false;
-                            System.out.println("They answered " + currAnswer + ", and the correct answer is " + correctAnswer);
-                            // if answer is correct send them 10 points, if wrong send them -10 points
-                            if (currAnswer == correctAnswer){
-                                out.writeObject("Score");
-                                out.writeInt(10);
+                            // if boolean is true, it's an answer. if boolean is false, its the final score
+                            if (in.readBoolean()){
+                                int currAnswer = in.readInt();
+                                waiting = false;
+                                System.out.println("They answered " + currAnswer + ", and the correct answer is " + correctAnswer);
+                                // if answer is correct send them 10 points, if wrong send them -10 points
+                                if (currAnswer == correctAnswer){
+                                    out.writeObject("Score");
+                                    out.writeInt(10);
+                                }
+                                else {
+                                    out.writeObject("Score");
+                                    out.writeInt(-10);
+                                }
+                                out.flush();
                             }
                             else {
-                                out.writeObject("Score");
-                                out.writeInt(-10);
+                                finalScore = in.readInt();
                             }
-                            out.flush();
+                            
                         } catch(SocketException se){
                             System.out.println("Client "+this.ID+" left");
                             break;
@@ -80,10 +88,12 @@ public class ClientHandler implements Runnable {
                 });
                 thread.start();
 
+                // example of calling final score below
+                System.out.println("The final score is " + finalScore());
+
                 // while game is running - this will send acks and nacks
                 while (GameManager.gameIsRunning){
                     // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
-                    System.out.println(GameManager.arrayQ[questionNumber-1]);
                     if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting){
                         waiting = true;
                         out.writeObject("Ack");
@@ -107,6 +117,7 @@ public class ClientHandler implements Runnable {
             }
         }
 
+        // this method sends the file of the question number that is input
         public void sendFile(int questionNumber){
             this.questionNumber = questionNumber;
             File file = null;
@@ -143,5 +154,26 @@ public class ClientHandler implements Runnable {
             catch (IOException e){
                 e.printStackTrace();
             }
+        }
+
+        // this method asks for final score and returns it
+        // the final score variable is updated within the thread within this class
+        public int finalScore(){
+            try {
+                out.writeObject("Final");
+                out.flush();
+                // will try to get final score for like 2-3 seconds
+                // if nothing comes back, we assume that client has been disconnected or something idk
+                int counter = 0;
+                while (finalScore == 0 && counter < 120){
+                    Thread.sleep(30);
+                    counter++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return finalScore;
         }
 }

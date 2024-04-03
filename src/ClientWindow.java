@@ -43,7 +43,7 @@ public class ClientWindow implements ActionListener
 	private ObjectInputStream inputStream;
 	private DataOutputStream outputStream;
 	private String serverIP;
-	private boolean noNACKS;
+	private boolean noNACKS = false;
 
 	private JFrame window;
 	
@@ -125,6 +125,7 @@ public class ClientWindow implements ActionListener
 						// read message type from server and take different action depending on it
 							String messageType = (String) inputStream.readObject();
 							if (messageType.equals("File".trim())){
+								submit.setEnabled(false);
 								// first thing that is sent is the question number
 								int questionNum = inputStream.readInt();
 								if (questionNum < 10){
@@ -158,8 +159,13 @@ public class ClientWindow implements ActionListener
 								noNACKS = true;
 							}
 							else if (messageType.equals("Nack".trim()) && !noNACKS){
-								// to do
+								// need it to display something
 								System.out.println("NACK");
+							}
+							else if (messageType.equals("Final".trim())){
+								outputStream.writeBoolean(false);
+								outputStream.writeInt(scoreCount);
+								outputStream.flush();
 							}
 					}
 				}
@@ -262,6 +268,7 @@ public class ClientWindow implements ActionListener
 			noNACKS = false;
 			// send whatever option was selected
 			try {
+				outputStream.writeBoolean(true);
 				outputStream.writeInt(currentSelection);
 				outputStream.flush();
 			}
