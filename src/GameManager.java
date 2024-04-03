@@ -8,16 +8,18 @@ public class GameManager implements Runnable{
     private ConcurrentLinkedQueue<Item> queue;
     public static ConcurrentLinkedQueue<Item> notFirst;
     public static int[] arrayQ;
+    public static int startingQuestion;
     public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
         nextQ = false;
         notFirst = new ConcurrentLinkedQueue<Item>();
         arrayQ = new int[20];
+        GameManager.startingQuestion = 1;
     }
 
     @Override
     public void run() {
-        System.out.println("run gameManager");
+        // System.out.println("run gameManager");
          //Using a thread to constantly look at the queue and handle new buzzes as they come in
          Thread queueLooker = new Thread(() -> {
             while(true){
@@ -46,13 +48,11 @@ public class GameManager implements Runnable{
         queueLooker.start();
 
         while(gameIsRunning){
-           System.out.println(nextQ);
-           System.out.println(clientAnswered);
             while(!clientAnswered){
                 System.out.print("");
             }
-            System.out.println("NextQ");
             nextQ = true;
+            GameManager.startingQuestion++;
             clientAnswered = false;
         }
         System.out.println("exited last loop");

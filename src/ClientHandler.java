@@ -51,7 +51,8 @@ public class ClientHandler implements Runnable {
 
                 // call sendFile when you want to send a certain question and just put in the question number
                 // everything else is handled
-                sendFile(1);
+                questionNumber = GameManager.startingQuestion;
+                sendFile(questionNumber);
 
 
                 // this thread will monitor answers from the client and then send them score
@@ -97,6 +98,7 @@ public class ClientHandler implements Runnable {
 
                 // while game is running - this will send acks and nacks
                 while (GameManager.gameIsRunning){
+                    // System.out.println("The question number is " + questionNumber + " and whether we are waiting is " + waiting);
                     // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
                     if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting){
                         waiting = true;
@@ -113,6 +115,7 @@ public class ClientHandler implements Runnable {
                     }
                     //this section is to send more questions
                     if(GameManager.nextQ){
+                        waiting = false;
                         questionNumber++;
                         if(questionNumber <= 20){
                             sendFile(questionNumber);
@@ -148,6 +151,7 @@ public class ClientHandler implements Runnable {
             try (Scanner scanner = new Scanner(file)){
                 // first send the type of message that the client will receive
                 String msgType = "File";
+                // System.out.println("File has been sent!");
                 out.writeObject(msgType);
                 // then send the name of the file
                 out.writeInt(questionNumber);
