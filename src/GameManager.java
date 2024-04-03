@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GameManager implements Runnable{
     public static Boolean gameIsRunning = true;
     public static Boolean nextQ;
-    public static Boolean clientAnswered;
+    public static Boolean clientAnswered = false;
     private ConcurrentLinkedQueue<Item> queue;
     public static ConcurrentLinkedQueue<Item> notFirst;
     public static int[] arrayQ;
@@ -17,7 +17,7 @@ public class GameManager implements Runnable{
 
     @Override
     public void run() {
-
+        System.out.println("run gameManager");
          //Using a thread to constantly look at the queue and handle new buzzes as they come in
          Thread queueLooker = new Thread(() -> {
             while(true){
@@ -45,12 +45,16 @@ public class GameManager implements Runnable{
         });
         queueLooker.start();
 
-        // while(gameIsRunning){
-           
-        //     while(!clientAnswered){
-        //         //stay
-        //     }
-        //     nextQ = true;
-        // }
+        while(gameIsRunning){
+           System.out.println(nextQ);
+           System.out.println(clientAnswered);
+            while(!clientAnswered){
+                System.out.println("");
+            }
+            System.out.println("NextQ");
+            nextQ = true;
+            clientAnswered = false;
+        }
+        System.out.println("exited last loop");
     }
 }

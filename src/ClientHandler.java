@@ -73,6 +73,10 @@ public class ClientHandler implements Runnable {
                                     out.writeInt(-10);
                                 }
                                 out.flush();
+                                //Update the value in GameManager saying they answered
+                                GameManager.clientAnswered = true;
+                                System.out.println("CLIENT ANSWERED");
+                                System.out.println(GameManager.clientAnswered);
                             }
                             else {
                                 finalScore = in.readInt();
@@ -106,6 +110,17 @@ public class ClientHandler implements Runnable {
                             out.writeObject("Nack");
                             out.flush();
                         }
+                    }
+                    //this section is to send more questions
+                    if(GameManager.nextQ){
+                        questionNumber++;
+                        if(questionNumber <= 20){
+                            sendFile(questionNumber);
+                        }
+                        else{
+                            GameManager.gameIsRunning = false; //Ends game if there are no Q's left
+                        }
+                        GameManager.nextQ = false;
                     }
                 }
 
@@ -146,7 +161,6 @@ public class ClientHandler implements Runnable {
                 // last line in file is just an int for the answer so store it
                 correctAnswer = scanner.nextInt();
                 out.flush();
-
                 scanner.close();
             }
             catch (IOException e){
