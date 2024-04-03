@@ -18,6 +18,8 @@ public class MainServer{
     private ArrayList<ClientHandler> activeClients;
     // executor service is what spins off threads
     private ExecutorService executorService = Executors.newCachedThreadPool();
+    private int winningScore;
+    private String winnerMessage;
 
     public MainServer(int port){
         gameOver = false;
@@ -56,11 +58,33 @@ public class MainServer{
                 ClientHandler ch = new ClientHandler(clientSocket, clientIDs);
                 activeClients.add(ch);
                 executorService.submit(ch);
+                //Used this to test if printing out final scores works
+                //if(clientIDs==4) gameOver=true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+        if(!activeClients.isEmpty()) winningScore = activeClients.get(0).finalScore();
+        else winnerMessage = "There are no active clients, so nobody won";
+
+        for(int i=0;i<activeClients.size();i++){
+            int clientID = activeClients.get(i).getID();
+            int finalScore = activeClients.get(i).finalScore();
+
+            System.out.println("Client "+clientID+"'s score is "+finalScore);
+
+            if(finalScore>winningScore){
+                winnerMessage = "Client "+clientID+" won with a score of "+finalScore;
+                winningScore = finalScore;
+            }
+            else if(finalScore==winningScore){
+                if(winnerMessage!=null) winnerMessage+="\nClient "+clientID+" also won with a score of "+finalScore;
+                else winnerMessage = "Client "+clientID+" won with a score of "+finalScore;
+            }
+        }
+
+        System.out.println(winnerMessage);
     }
 
 
