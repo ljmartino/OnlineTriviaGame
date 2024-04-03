@@ -49,7 +49,7 @@ public class GameManager implements Runnable{
            System.out.println(nextQ);
            System.out.println(clientAnswered);
             while(!clientAnswered){
-                System.out.println("");
+                System.out.print("");
             }
             System.out.println("NextQ");
             nextQ = true;
