@@ -89,7 +89,7 @@ public class ClientHandler implements Runnable {
                 thread.start();
 
                 // example of calling final score below
-                System.out.println("The final score is " + finalScore());
+                // System.out.println("The final score is " + finalScore());
 
                 // while game is running - this will send acks and nacks
                 while (GameManager.gameIsRunning){
@@ -109,8 +109,6 @@ public class ClientHandler implements Runnable {
                     }
                 }
 
-                //Closing socket
-                // clientSocket.close();
             } catch (IOException ioException)
             {
                 ioException.printStackTrace();
@@ -175,5 +173,15 @@ public class ClientHandler implements Runnable {
                 e.printStackTrace();
             }
             return finalScore;
+        }
+
+        // kill switch - close the socket and don't let client buzz anymore
+        public void killSwitch(){
+            try {
+                out.writeObject("Kill");
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 }

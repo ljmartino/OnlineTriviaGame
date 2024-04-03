@@ -162,10 +162,15 @@ public class ClientWindow implements ActionListener
 								// need it to display something
 								System.out.println("NACK");
 							}
+							// if asked for final score, send it
 							else if (messageType.equals("Final".trim())){
 								outputStream.writeBoolean(false);
 								outputStream.writeInt(scoreCount);
 								outputStream.flush();
+							}
+							// if killed make buzz impossible
+							else if (messageType.equals("Kill".trim())){
+								buzz.setEnabled(false);
 							}
 					}
 				}
