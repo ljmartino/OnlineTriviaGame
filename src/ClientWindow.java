@@ -35,6 +35,8 @@ public class ClientWindow implements ActionListener
 	private JLabel score;
     private int scoreCount;
 	private TimerTask clock;
+	private JLabel messageLabel;
+	private boolean currentNack;
 
 	// clientID is given from the server
 	private Integer ClientID;
@@ -82,6 +84,11 @@ public class ClientWindow implements ActionListener
 		submit = new JButton("Submit");  // button to submit their answer
 		submit.setBounds(200, 300, 100, 20);
 		submit.addActionListener(this);  // calls actionPerformed of this class
+
+		messageLabel = new JLabel("You did not buzz first!");
+		messageLabel.setForeground(Color.RED);
+		messageLabel.setFont(new Font("Dialog", Font.PLAIN, 20));
+		messageLabel.setBounds(500, 200, 200, 100);
 		
 		
 		window.setSize(600,400);
@@ -161,6 +168,8 @@ public class ClientWindow implements ActionListener
 							else if (messageType.equals("Nack".trim()) && !noNACKS){
 								// need it to display something
 								System.out.println("NACK");
+								showNackMessage();
+								
 							}
 							// if asked for final score, send it
 							else if (messageType.equals("Final".trim())){
@@ -228,6 +237,10 @@ public class ClientWindow implements ActionListener
 
 		 // add the score
 		 window.add(score);
+
+		 // add the nack text
+		 window.add(messageLabel);
+		 messageLabel.setVisible(false);
 	
 		// Repaint the window to reflect changes
 		window.revalidate();
@@ -300,6 +313,24 @@ public class ClientWindow implements ActionListener
 		}
 
 		//question.setText("Q2. This is another test problem " + random.nextInt());
+		
+	}
+
+	// show the nack message for 2 seconds if there is currently no nack message visible
+	public void showNackMessage(){
+		if (!currentNack){
+			currentNack = true;
+			messageLabel.setVisible(true);
+			new Thread(() -> {
+				try {
+					Thread.sleep(2000); // Wait for 2 seconds
+					SwingUtilities.invokeLater(() -> messageLabel.setVisible(false)); // Hide the label
+					currentNack = false;
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}).start();
+		}
 		
 	}
 	
