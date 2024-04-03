@@ -35,6 +35,7 @@ public class ClientWindow implements ActionListener
 	private JLabel score;
     private int scoreCount;
 	private TimerTask clock;
+	private Timer t;
 	private JLabel messageLabel;
 	private boolean currentNack;
 
@@ -67,8 +68,8 @@ public class ClientWindow implements ActionListener
 		timer = new JLabel("TIMER");  // represents the countdown shown on the window
 		timer.setBounds(250, 250, 100, 20);
 
-		// clock = new TimerCode(35);  // represents clocked task that should run after X seconds
-		// Timer t = new Timer();  // event generator
+		// clock = new TimerCode(35, false);  // represents clocked task that should run after X seconds
+		Timer t = new Timer();  // event generator
 		// t.schedule(clock, 0, 1000); // clock is called every second
 		
 		score = new JLabel("SCORE: "+scoreCount); // represents the score
@@ -158,6 +159,14 @@ public class ClientWindow implements ActionListener
 							// if the message is an ack, then allow user to answer
 							else if (messageType.equals("Ack".trim())){
 								System.out.println("Ack received");
+								while(TimerCode.isRunning()) {
+									System.out.print("ack");
+								}
+								t.cancel();
+								clock = new TimerCode(10, true);
+								t = new Timer();
+								t.schedule(clock, 0, 1000);
+								buzz.setEnabled(false);
 								submit.setEnabled(true);
             					options[0].setEnabled(true);
             					options[1].setEnabled(true);
@@ -169,7 +178,19 @@ public class ClientWindow implements ActionListener
 								// need it to display something
 								System.out.println("NACK");
 								showNackMessage();
-								
+								while(TimerCode.isRunning()) {
+									System.out.print("nack");
+								}
+								t.cancel();
+								buzz.setEnabled(false);
+								clock = new TimerCode(10, true);
+								t = new Timer();
+								t.schedule(clock, 0, 1000);
+								submit.setEnabled(false);
+            					options[0].setEnabled(false);
+            					options[1].setEnabled(false);
+            					options[2].setEnabled(false);
+            					options[3].setEnabled(false);
 							}
 							// if asked for final score, send it
 							else if (messageType.equals("Final".trim())){
@@ -197,13 +218,17 @@ public class ClientWindow implements ActionListener
 	}
 
 	public void displayQuestion(String[] questionFile){
+		buzz.setEnabled(true);
 
 		// Remove existing components from the window
 		window.getContentPane().removeAll();
 		window.setTitle("Trivia - Player #"+this.ClientID);
 	
-		clock = new TimerCode(30);
-		Timer t = new Timer();  // event generator
+		if(TimerCode.isRunning()) {
+			t.cancel();
+		}
+		clock = new TimerCode(15, false);
+		t = new Timer();
 		t.schedule(clock, 0, 1000); // clock is called every second
 
 		// Add the new question label
@@ -293,13 +318,16 @@ public class ClientWindow implements ActionListener
 			catch (IOException e2){
 				e2.printStackTrace();
 			}
-
-            // buzz.setEnabled(true);
 			submit.setEnabled(false);
             options[0].setEnabled(false);
             options[1].setEnabled(false);
             options[2].setEnabled(false);
             options[3].setEnabled(false);
+			while(TimerCode.isRunning()) {
+				System.out.print("");
+			}
+			//t.cancel();
+			window.repaint();
 		} else if(input.equals(optionsText[0])){
 			currentSelection = 0;
 		} else if(input.equals(optionsText[1])){
@@ -338,34 +366,69 @@ public class ClientWindow implements ActionListener
 	public class TimerCode extends TimerTask
 	{
 		private int duration;  // write setters and getters as you need
-		public TimerCode(int duration)
+		private boolean forAnswer; //true if for submitting, false if for buzzing
+		private static boolean isRunning;
+		public TimerCode(int duration, boolean forAnswer)
 		{
 			this.duration = duration;
+			this.forAnswer = forAnswer;
+			isRunning = false;
 		}
+
+		public static boolean isRunning(){
+			return isRunning;
+		}
+
 		@Override
 		public void run()
 		{
-			if(duration < 0)
-			{
-				timer.setText("Timer expired");
-				window.repaint();
-				buzz.setEnabled(false);
-				submit.setEnabled(false);
-            	options[0].setEnabled(false);
-            	options[1].setEnabled(false);
-            	options[2].setEnabled(false);
-            	options[3].setEnabled(false);
-				JOptionPane.showMessageDialog(window, "Your final score is "+scoreCount);
-				this.cancel();  // cancel the timed task
-				return;
-				// you can enable/disable your buttons for poll/submit here as needed
+			isRunning = true;
+			if(duration < 0) isRunning = false;
+			if(forAnswer){
+				if(duration<0){
+					timer.setText("Timer expired");
+					window.repaint();
+					buzz.setEnabled(true);
+					submit.setEnabled(false);
+            		options[0].setEnabled(false);
+            		options[1].setEnabled(false);
+            		options[2].setEnabled(false);
+            		options[3].setEnabled(false);
+					this.cancel();
+					return;
+				}
+			} else{
+				if(duration<0){
+					timer.setText("Timer expired");
+					window.repaint();
+					this.cancel();
+					return;
+				}
 			}
+			// if(duration < 0)
+			// {
+			// 	//isRunning = false;
+			// 	timer.setText("Timer expired");
+			// 	window.repaint();
+			// 	buzz.setEnabled(false);
+			// 	submit.setEnabled(false);
+            // 	options[0].setEnabled(false);
+            // 	options[1].setEnabled(false);
+            // 	options[2].setEnabled(false);
+            // 	options[3].setEnabled(false);
+			// 	JOptionPane.showMessageDialog(window, "Your final score is "+scoreCount);
+			// 	this.cancel();  // cancel the timed task
+			// 	return;
+			// 	// you can enable/disable your buttons for poll/submit here as needed
+			// }
 			
 			if(duration < 6)
 				timer.setForeground(Color.red);
 			else
 				timer.setForeground(Color.black);
 			
+			System.out.println(duration);
+			System.out.println(isRunning);
 			timer.setText(duration+"");
 			duration--;
 			window.repaint();
