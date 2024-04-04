@@ -48,6 +48,7 @@ public class ClientWindow implements ActionListener
 	private DataOutputStream outputStream;
 	private String serverIP;
 	private boolean noNACKS = false;
+	private boolean hasBuzzed = false;
 
 	private JFrame window;
 	
@@ -223,6 +224,7 @@ public class ClientWindow implements ActionListener
 
 	public void displayQuestion(String[] questionFile){
 		buzz.setEnabled(true);
+		hasBuzzed = false;
 
 		// Remove existing components from the window
 		window.getContentPane().removeAll();
@@ -287,8 +289,9 @@ public class ClientWindow implements ActionListener
 		// input refers to the radio button you selected or button you clicked
 		String input = e.getActionCommand();  
 		
-		if(input.equals("Buzz")){
+		if(input.equals("Buzz") && !hasBuzzed){
 			// buzz.setEnabled(false);
+			hasBuzzed = true;
 			
 			byte[] buf = null;
 			String message = ClientID+","+questionNumber;
