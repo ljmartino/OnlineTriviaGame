@@ -72,6 +72,9 @@ public class GameManager implements Runnable{
                         });
                         thisQThread.start();
                     }
+                    else if (UDPManager.notAnsweredArray[GameManager.startingQuestion -1]){
+                        UDPManager.notAnsweredArray[GameManager.startingQuestion -1] = false;
+                    }
                     //System.out.println("Queue is empty");
                 }
 

@@ -15,7 +15,7 @@ public class UDPManager implements Runnable {
         this.port = port;
         // not sure what type the queue should be, probably need to specify at some point
         queue = q;
-        notAnsweredArray = new boolean[20];
+        notAnsweredArray = new boolean[21];
         // set up the UDP socket
         try {
             datagramSocket = new DatagramSocket(port);

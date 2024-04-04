@@ -211,7 +211,7 @@ public class ClientHandler implements Runnable {
                 }
                 GameManager.finalScoresFound = true;
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -137,7 +138,17 @@ public class ClientWindow implements ActionListener
 				try{
 					while (true){
 						// read message type from server and take different action depending on it
-							String messageType = (String) inputStream.readObject();
+							String messageType = null;
+							try {
+								messageType = (String) inputStream.readObject();
+							}
+							catch(StreamCorruptedException e){
+								messageType = "Nack";
+								// inputStream = new ObjectInputStream(socket.getInputStream());
+								System.out.println("StreamCorruptedException was caught");
+								continue;
+							}
+						
 							if (messageType.equals("File".trim())){
 								noNACKS = false;
 								System.out.println("File received");
