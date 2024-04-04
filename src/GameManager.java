@@ -15,12 +15,14 @@ public class GameManager implements Runnable{
         queue = q;
         nextQ = false;
         // notFirst = new ConcurrentLinkedQueue<Item>();
-        arrayQ = new int[20];
+        arrayQ = new int[21];
         GameManager.startingQuestion = 1;
         GameManager.nackList = new ArrayList<Boolean>();
     }
     public static boolean someoneAnswering = false;
     public static boolean thisQFlipped = false;
+
+    public static boolean finalScoresFound = false;
 
     @Override
     public void run() {
@@ -72,12 +74,18 @@ public class GameManager implements Runnable{
                     }
                     //System.out.println("Queue is empty");
                 }
+
+                // if the final scores have been found, declare a winner and end the loop
+                if (GameManager.finalScoresFound){
+                    MainServer.winner();
+                    break;
+                }
                 
             }
         });
         queueLooker.start();
 
-        while(gameIsRunning){
+        while(GameManager.gameIsRunning){
             while(!clientAnswered){
                 System.out.print("");
             }

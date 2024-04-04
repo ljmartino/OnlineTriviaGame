@@ -39,6 +39,7 @@ public class ClientWindow implements ActionListener
 	private Timer t;
 	private JLabel messageLabel;
 	private boolean currentNack;
+	private boolean winMessageShown = false;
 
 	// clientID is given from the server
 	private Integer ClientID;
@@ -207,6 +208,11 @@ public class ClientWindow implements ActionListener
 								outputStream.writeBoolean(false);
 								outputStream.writeInt(scoreCount);
 								outputStream.flush();
+								window.dispose();
+								if (!winMessageShown){
+									JOptionPane.showMessageDialog(window, "Your final score is "+scoreCount);
+									winMessageShown = true;
+								}
 							}
 							// if killed make buzz impossible
 							else if (messageType.equals("Kill".trim())){

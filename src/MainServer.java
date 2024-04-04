@@ -15,11 +15,11 @@ public class MainServer{
     // gets incremented everytime a client is added, assigned to client
     private int clientIDs;
     //List of active clients maintained by server
-    private ArrayList<ClientHandler> activeClients;
+    private static ArrayList<ClientHandler> activeClients;
     // executor service is what spins off threads
     private ExecutorService executorService = Executors.newCachedThreadPool();
-    private int winningScore;
-    private String winnerMessage;
+    private static int winningScore;
+    private static String winnerMessage;
 
     public MainServer(int port){
         gameOver = false;
@@ -65,6 +65,9 @@ public class MainServer{
             }
         }
 
+    }
+
+    public static void winner(){
         if(!activeClients.isEmpty()) winningScore = activeClients.get(0).finalScore();
         else winnerMessage = "There are no active clients, so nobody won";
 
@@ -86,7 +89,6 @@ public class MainServer{
 
         System.out.println(winnerMessage);
     }
-
 
 
 

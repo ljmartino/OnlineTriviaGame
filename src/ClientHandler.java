@@ -17,6 +17,8 @@ public class ClientHandler implements Runnable {
         private boolean waiting = false;
         public int questionNumber;
         private boolean nackSent;
+        private boolean lastQuestionAnswered = false;
+        private boolean finalScoreCalled = false;
 
         // correct answer is updated whenever we send a file
         private int correctAnswer = -1;
@@ -64,10 +66,17 @@ public class ClientHandler implements Runnable {
                 // this thread will monitor answers from the client and then send them score
                 Thread thread = new Thread(() -> {
                     while (true){
+                        if (!GameManager.gameIsRunning && !finalScoreCalled){
+                            finalScore = finalScore();
+                            finalScoreCalled = true;
+                        }
                         try {
                             // if boolean is true, it's an answer. if boolean is false, its the final score
                             if (in.readBoolean()){
                                 int currAnswer = in.readInt();
+                                if (questionNumber == 20){
+                                    lastQuestionAnswered = true;
+                                }
                                 waiting = false;
                                 System.out.println("They answered " + currAnswer + ", and the correct answer is " + correctAnswer);
                                 // if answer is correct send them 10 points, if wrong send them -10 points
@@ -112,7 +121,7 @@ public class ClientHandler implements Runnable {
                     // System.out.println("The question number is " + questionNumber + " and whether we are waiting is " + waiting);
                     // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
                     System.out.print("");
-                    if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting){
+                    if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting && !lastQuestionAnswered){
                         waiting = true;
                         out.writeObject("Ack");
                         out.flush();
@@ -134,7 +143,9 @@ public class ClientHandler implements Runnable {
                             sendFile(questionNumber);
                         }
                         else{
+                            System.out.println("Gameisrunning flipped to false");
                             GameManager.gameIsRunning = false; //Ends game if there are no Q's left
+                            finalScore = finalScore();
                         }
                         GameManager.nextQ = false;
                     }
@@ -195,9 +206,10 @@ public class ClientHandler implements Runnable {
                 // if nothing comes back, we assume that client has been disconnected or something idk
                 int counter = 0;
                 while (finalScore == 0 && counter < 120){
-                    Thread.sleep(30);
+                    Thread.sleep(50);
                     counter++;
                 }
+                GameManager.finalScoresFound = true;
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
