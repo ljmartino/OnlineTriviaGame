@@ -16,9 +16,11 @@ public class GameManager implements Runnable{
         nextQ = false;
         // notFirst = new ConcurrentLinkedQueue<Item>();
         arrayQ = new int[20];
-        GameManager.startingQuestion = 1;
+        GameManager.startingQuestion = 19;
         GameManager.nackList = new ArrayList<Boolean>();
     }
+    public static boolean someoneAnswering = false;
+    public static boolean thisQFlipped = false;
 
     @Override
     public void run() {
@@ -38,6 +40,10 @@ public class GameManager implements Runnable{
                         }
                         else{//nothing was in the spot: first buzz for that specific question
                             GameManager.arrayQ[next.getQuestionNumber()-1] = next.getID(); //Adds client ID to the array
+                            if (next.getQuestionNumber() == GameManager.startingQuestion){
+                                GameManager.someoneAnswering = true;
+                            }
+                            
                         }
                     }
                     catch(NoSuchElementException e){
@@ -45,6 +51,25 @@ public class GameManager implements Runnable{
                     }
                 }
                 else{
+                    // if nobody answered this specific question, move on
+                    if (GameManager.startingQuestion < 21 && UDPManager.notAnsweredArray[GameManager.startingQuestion -1] && !GameManager.someoneAnswering && !GameManager.thisQFlipped){
+                        System.out.println("Client answered has been flipped to true by notAnswered");
+                        System.out.println("Starting question value is " + GameManager.startingQuestion);
+                        clientAnswered = true;
+                        GameManager.someoneAnswering = false;
+                        GameManager.thisQFlipped = true;
+                        // make a quick thread that will make sure that the question doesn't get double skipped over
+                        Thread thisQThread = new Thread(() -> {
+                            try{
+                                Thread.sleep(2000);
+                                GameManager.thisQFlipped = false;
+                            }
+                            catch (InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        });
+                        thisQThread.start();
+                    }
                     //System.out.println("Queue is empty");
                 }
                 
@@ -58,6 +83,7 @@ public class GameManager implements Runnable{
             }
             nextQ = true;
             GameManager.startingQuestion++;
+            GameManager.someoneAnswering = false;
             clientAnswered = false;
         }
         System.out.println("exited last loop");

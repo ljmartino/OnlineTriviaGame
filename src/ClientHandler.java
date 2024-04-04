@@ -111,6 +111,7 @@ public class ClientHandler implements Runnable {
                 while (GameManager.gameIsRunning){
                     // System.out.println("The question number is " + questionNumber + " and whether we are waiting is " + waiting);
                     // if the ID of the client answering is this client and not waiting for an answer already, then send Ack
+                    System.out.print("");
                     if (GameManager.arrayQ[questionNumber-1] == (Integer)this.ID && !waiting){
                         waiting = true;
                         out.writeObject("Ack");
@@ -128,7 +129,7 @@ public class ClientHandler implements Runnable {
                     if(GameManager.nextQ){
                         this.nackSent = false;
                         waiting = false;
-                        questionNumber++;
+                        questionNumber = GameManager.startingQuestion;
                         if(questionNumber <= 20){
                             sendFile(questionNumber);
                         }

@@ -301,7 +301,7 @@ public class ClientWindow implements ActionListener
 			hasBuzzed = true;
 			
 			byte[] buf = null;
-			String message = ClientID+","+questionNumber;
+			String message = ClientID+","+questionNumber;		
 			buf = message.getBytes();
 			InetAddress ip = null;
 			try {
@@ -436,8 +436,31 @@ public class ClientWindow implements ActionListener
 					return;
 				}
 			} else{
+				// if the buzz timer hits zero, send UDP message that lets server know that you didn't buzz
+				// the server will take in the first message for each question and discard the rest
 				if(duration<0){
 					timer.setText("Timer expired");
+					byte[] buf = null;
+					String message = 1+"!"+questionNumber;		
+					buf = message.getBytes();
+					InetAddress ip = null;
+					try {
+						ip = InetAddress.getByName(serverIP);
+					} catch (UnknownHostException e1) {
+						e1.printStackTrace();
+					}
+					int port = 1111;
+					DatagramPacket pkt = new DatagramPacket(buf, buf.length, ip, port);
+					DatagramSocket skt = null;
+					try {
+						skt = new DatagramSocket();
+						skt.send(pkt);
+						for(int i=0;i<buf.length;i++){
+							System.out.println("You sent: "+buf[i]);
+						}
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 					window.repaint();
 					this.cancel();
 					return;
