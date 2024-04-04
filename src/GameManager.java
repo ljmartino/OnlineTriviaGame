@@ -16,7 +16,7 @@ public class GameManager implements Runnable{
         nextQ = false;
         // notFirst = new ConcurrentLinkedQueue<Item>();
         arrayQ = new int[20];
-        GameManager.startingQuestion = 19;
+        GameManager.startingQuestion = 1;
         GameManager.nackList = new ArrayList<Boolean>();
     }
     public static boolean someoneAnswering = false;
