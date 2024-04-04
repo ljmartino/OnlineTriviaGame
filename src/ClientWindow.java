@@ -143,7 +143,8 @@ public class ClientWindow implements ActionListener
 								messageType = (String) inputStream.readObject();
 							}
 							catch(StreamCorruptedException e){
-								messageType = "Nack";
+								window.dispose();
+								socket.close();
 								// inputStream = new ObjectInputStream(socket.getInputStream());
 								System.out.println("StreamCorruptedException was caught");
 								continue;
