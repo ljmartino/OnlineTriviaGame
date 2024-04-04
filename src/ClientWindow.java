@@ -49,6 +49,9 @@ public class ClientWindow implements ActionListener
 	private String serverIP;
 	private boolean noNACKS = false;
 	private boolean hasBuzzed = false;
+	// these booleans control whether points are subtract for not submitting
+	private boolean answerEntered = false;
+	private boolean answering = false;
 
 	private JFrame window;
 	
@@ -163,6 +166,8 @@ public class ClientWindow implements ActionListener
 							// if the message is an ack, then allow user to answer
 							else if (messageType.equals("Ack".trim())){
 								System.out.println("Ack received");
+								// this means they will now be answering
+								answering = true;
 								while(TimerCode.isRunning()) {
 									System.out.print("");
 								}
@@ -317,6 +322,7 @@ public class ClientWindow implements ActionListener
 		} else if(input.equals("Submit")){
 			// disable all input and then submit answer when timer concludes so that everyone moves on
 			noNACKS = false;
+			answerEntered = true;
 			submit.setEnabled(false);
             options[0].setEnabled(false);
             options[1].setEnabled(false);
@@ -401,6 +407,21 @@ public class ClientWindow implements ActionListener
 			if(duration < 0) isRunning = false;
 			if(forAnswer){
 				if(duration<0){
+					// if an answer has not been entered, and they are actively the client answering send answer option 5 to server
+					// this will deduct 20 points from score for not answering
+					if (!answerEntered && answering){
+						try {
+							outputStream.writeBoolean(true);
+							outputStream.writeInt(5);
+							outputStream.flush();
+						}
+						catch (IOException e){
+							e.printStackTrace();
+						}
+					}
+					// reset the variables to false
+					answerEntered = false;
+					answering = false;
 					timer.setText("Timer expired");
 					window.repaint();
 					buzz.setEnabled(true);

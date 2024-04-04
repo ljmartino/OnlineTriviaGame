@@ -75,6 +75,11 @@ public class ClientHandler implements Runnable {
                                     out.writeObject("Score");
                                     out.writeInt(10);
                                 }
+                                // answer of 5 means they did not answer, subtract 20 points
+                                else if (currAnswer == 5){
+                                    out.writeObject("Score");
+                                    out.writeInt(-20);
+                                }
                                 else {
                                     out.writeObject("Score");
                                     out.writeInt(-10);
