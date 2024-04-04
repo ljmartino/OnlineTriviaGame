@@ -192,7 +192,7 @@ public class ClientHandler implements Runnable {
                 scanner.close();
             }
             catch (IOException e){
-                e.printStackTrace();
+                System.out.println("Connection reset by peer");
             }
         }
 
