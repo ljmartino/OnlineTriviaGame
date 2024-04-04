@@ -230,6 +230,8 @@ public class ClientWindow implements ActionListener
 	public void displayQuestion(String[] questionFile){
 		buzz.setEnabled(true);
 		hasBuzzed = false;
+		answering = false;
+		answerEntered = false;
 
 		// Remove existing components from the window
 		window.getContentPane().removeAll();
