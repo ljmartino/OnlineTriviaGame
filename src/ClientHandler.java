@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -106,9 +107,12 @@ public class ClientHandler implements Runnable {
                         } catch(SocketException se){
                             System.out.println("Client "+this.ID+" left");
                             break;
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (EOFException e){
+                            killSwitch();
                         }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        } 
                     }
                 });
                 thread.start();
@@ -224,7 +228,6 @@ public class ClientHandler implements Runnable {
                 out.writeObject("Kill");
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 }
