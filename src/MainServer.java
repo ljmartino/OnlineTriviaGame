@@ -43,7 +43,7 @@ public class MainServer{
         
         System.out.println("Joining period has started, 30 seconds to join");  //Does this work?????
         try {
-            Thread.sleep(3000); //Waits 30 seconds to start accepting
+            Thread.sleep(30000); //Waits 30 seconds to start accepting
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
