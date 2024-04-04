@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -6,15 +7,17 @@ public class GameManager implements Runnable{
     public static Boolean nextQ;
     public static Boolean clientAnswered = false;
     private ConcurrentLinkedQueue<Item> queue;
-    public static ConcurrentLinkedQueue<Item> notFirst;
+    // public static ConcurrentLinkedQueue<Item> notFirst;
     public static int[] arrayQ;
     public static int startingQuestion;
+    public static ArrayList<Boolean> nackList;
     public GameManager(ConcurrentLinkedQueue<Item> q){
         queue = q;
         nextQ = false;
-        notFirst = new ConcurrentLinkedQueue<Item>();
+        // notFirst = new ConcurrentLinkedQueue<Item>();
         arrayQ = new int[20];
         GameManager.startingQuestion = 1;
+        GameManager.nackList = new ArrayList<Boolean>();
     }
 
     @Override
@@ -29,7 +32,9 @@ public class GameManager implements Runnable{
                         //Looks at array and finds out if someone answered already
                         if(GameManager.arrayQ[next.getQuestionNumber()-1] != 0){
                             //question was already answered by another client
-                            GameManager.notFirst.add(next);
+                            // flip value in NackList to true
+                            GameManager.nackList.set(next.getID()-1, true);
+                            // GameManager.notFirst.add(next);
                         }
                         else{//nothing was in the spot: first buzz for that specific question
                             GameManager.arrayQ[next.getQuestionNumber()-1] = next.getID(); //Adds client ID to the array

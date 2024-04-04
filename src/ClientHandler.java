@@ -16,6 +16,7 @@ public class ClientHandler implements Runnable {
         private DataInputStream in;
         private boolean waiting = false;
         public int questionNumber;
+        private boolean nackSent;
 
         // correct answer is updated whenever we send a file
         private int correctAnswer = -1;
@@ -39,6 +40,9 @@ public class ClientHandler implements Runnable {
         @Override
         public void run()
         {
+            // add an entry to NackList so that it always contains N entries
+            // even if people leave, the placement will stay the same
+            GameManager.nackList.add(false);
            
             try 
             {
@@ -51,9 +55,11 @@ public class ClientHandler implements Runnable {
 
                 // call sendFile when you want to send a certain question and just put in the question number
                 // everything else is handled
+                System.out.println("Client handler running");
                 questionNumber = GameManager.startingQuestion;
                 sendFile(questionNumber);
 
+                System.out.println("Question sent");
 
                 // this thread will monitor answers from the client and then send them score
                 Thread thread = new Thread(() -> {
@@ -105,16 +111,17 @@ public class ClientHandler implements Runnable {
                         out.writeObject("Ack");
                         out.flush();
                     }
-                    // else if not first is equal to this ID, remove it and send a nack
-                    else if (!GameManager.notFirst.isEmpty()){
-                        if (GameManager.notFirst.peek().getID() == (Integer) this.ID){
-                            GameManager.notFirst.remove();
-                            out.writeObject("Nack");
-                            out.flush();
-                        }
+                    // if our nackList value for this client is true, then send a nack
+                    else if (GameManager.nackList.get(this.ID - 1) && !this.nackSent){
+                        out.writeObject("Nack");
+                        out.flush();
+                        this.nackSent = true;
+                        // set nackList value to false
+                        GameManager.nackList.set(this.ID - 1, false);
                     }
                     //this section is to send more questions
                     if(GameManager.nextQ){
+                        this.nackSent = false;
                         waiting = false;
                         questionNumber++;
                         if(questionNumber <= 20){

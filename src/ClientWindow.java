@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -133,6 +134,8 @@ public class ClientWindow implements ActionListener
 						// read message type from server and take different action depending on it
 							String messageType = (String) inputStream.readObject();
 							if (messageType.equals("File".trim())){
+								noNACKS = false;
+								System.out.println("File received");
 								submit.setEnabled(false);
 								// first thing that is sent is the question number
 								int questionNum = inputStream.readInt();
@@ -160,7 +163,7 @@ public class ClientWindow implements ActionListener
 							else if (messageType.equals("Ack".trim())){
 								System.out.println("Ack received");
 								while(TimerCode.isRunning()) {
-									System.out.print("ack");
+									System.out.print("");
 								}
 								t.cancel();
 								clock = new TimerCode(10, true);
@@ -175,12 +178,13 @@ public class ClientWindow implements ActionListener
 								noNACKS = true;
 							}
 							else if (messageType.equals("Nack".trim()) && !noNACKS){
+								noNACKS = true;
 								// need it to display something
 								System.out.println("NACK");
-								showNackMessage();
 								while(TimerCode.isRunning()) {
-									System.out.print("nack");
+									System.out.print("");
 								}
+								showNackMessage();
 								t.cancel();
 								buzz.setEnabled(false);
 								clock = new TimerCode(10, true);
@@ -308,26 +312,34 @@ public class ClientWindow implements ActionListener
 				e1.printStackTrace();
 			}
 		} else if(input.equals("Submit")){
+			// disable all input and then submit answer when timer concludes so that everyone moves on
 			noNACKS = false;
-			// send whatever option was selected
-			try {
-				outputStream.writeBoolean(true);
-				outputStream.writeInt(currentSelection);
-				outputStream.flush();
-			}
-			catch (IOException e2){
-				e2.printStackTrace();
-			}
 			submit.setEnabled(false);
             options[0].setEnabled(false);
             options[1].setEnabled(false);
             options[2].setEnabled(false);
             options[3].setEnabled(false);
-			while(TimerCode.isRunning()) {
-				System.out.print("");
-			}
-			//t.cancel();
-			window.repaint();
+			// putting this in a thread so users can still see the timer counting
+			Thread thread = new Thread(() -> {
+				while(TimerCode.isRunning()) {
+					System.out.print("");
+				}
+				// send whatever option was selected
+				try {
+					outputStream.writeBoolean(true);
+					outputStream.writeInt(currentSelection);
+					outputStream.flush();
+				}
+				catch (IOException e2){
+					e2.printStackTrace();
+				}
+				
+				
+				//t.cancel();
+				window.repaint();
+			});
+			thread.start();
+			
 		} else if(input.equals(optionsText[0])){
 			currentSelection = 0;
 		} else if(input.equals(optionsText[1])){

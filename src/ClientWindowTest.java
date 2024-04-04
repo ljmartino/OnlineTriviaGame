@@ -5,6 +5,6 @@ public class ClientWindowTest {
 		//Lukas IP: 10.111.142.92
 		String ipAddress = "localhost";
 		int port = 5000;
-		ClientWindow window = new ClientWindow(ipAddress, port);
+		new ClientWindow(ipAddress, port);
 	}
 }
