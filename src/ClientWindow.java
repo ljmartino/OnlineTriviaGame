@@ -15,6 +15,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
 import java.util.TimerTask;
@@ -232,7 +233,9 @@ public class ClientWindow implements ActionListener
 							}
 					}
 				}
-				catch (IOException e){
+				catch(SocketException e1){
+					window.dispose();
+				} catch (IOException e){
 					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
