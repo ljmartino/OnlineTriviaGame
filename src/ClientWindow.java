@@ -236,6 +236,7 @@ public class ClientWindow implements ActionListener
 				catch(SocketException e1){
 					window.dispose();
 					System.out.println("Lost connection to server.. Shutting down");
+					JOptionPane.showMessageDialog(null, "Lost connection to server... shutting down");
 					System.exit(0);
 				} catch (IOException e){
 					e.printStackTrace();
